@@ -1,27 +1,41 @@
 #Interactive Diameter Client
-import socket
-import sys
 import os
-import diameter
+import sys
+import socket
 import time
 import _thread
-global recv_ip
 import yaml
-with open("config.yaml", 'r') as stream:
-    yaml_config = (yaml.safe_load(stream))
+
+sys.path.append(os.path.realpath('../lib'))
+import diameter
+from logtool import LogTool
+
+with open("../config.yaml", 'r') as stream:
+    config = (yaml.safe_load(stream))
+
+global recv_ip
 
 #Values to change / tweak
-recv_ip = yaml_config['hss']['bind_ip']                                                         #IP of this Machine
-diameter_host = yaml_config['hss']['OriginHost']                                                        #Diameter Host of this Machine
-realm = yaml_config['hss']['OriginRealm']                                          #Diameter Realm of this machine
-DestinationHost = ""                                             #Diameter Host of Destination
-DestinationRealm = input("Enter Diameter Realm: ")                                                #Diameter Realm of Destination
-hostname = input("Enter IP of Diameter Peer to connect to: ")                                                         #IP of Remote Diameter Host
-mcc = yaml_config['hss']['MCC']                                                                     #Mobile Country Code
-mnc = yaml_config['hss']['MNC']                                                                      #Mobile Network Code
-transport = yaml_config['hss']['transport']                                                              #Transport Type - TCP or SCTP (SCTP Support is basic)
+recv_ip = config['hss']['bind_ip']                                  #IP of this Machine
+diameter_host = config['hss']['OriginHost']                         #Diameter Host of this Machine
+realm = config['hss']['OriginRealm']                                #Diameter Realm of this machine
+DestinationHost = ""                                                #Diameter Host of Destination
+DestinationRealm = input("Enter Diameter Realm: ")                  #Diameter Realm of Destination
+hostname = input("Enter IP of Diameter Peer to connect to: ")       #IP of Remote Diameter Host
+mcc = config['hss']['MCC']                                          #Mobile Country Code
+mnc = config['hss']['MNC']                                          #Mobile Network Code
+transport = config['hss']['transport']                              #Transport Type - TCP or SCTP (SCTP Support is basic)
 
-diameter = diameter.Diameter(diameter_host, realm, 'PyHSS-client', str(mcc), str(mnc))
+logTool = LogTool(config)
+
+diameter = diameter.Diameter(
+    logTool=logTool,
+    originHost=diameter_host,
+    originRealm=realm,
+    mnc=str(mnc),
+    mcc=str(mcc),
+)
+
 sessionid = str(diameter_host) + ';' + diameter.generate_id(5) + ';1;app_gy'
 
 supported_calls = ["CER", "DWR", "AIR", "ULR", "UAR", "PUR", "SAR", "MAR", "MCR", "LIR", "RIR", "CLR", "NOR", "DEP", "UDR", "OCS-CCR", "PCRF-CCR", "ECR", "SH-PUR"]
@@ -75,11 +89,11 @@ def ReadBuffer():
                         SendRequest(diameter.Answer_257(packet_vars, avps, recv_ip))
                     else:
                         print("Is CEA")
-                        
-                    
-                if input("Print AVPs (Y/N):\t") == "Y":
-                    for avp in avps:
-                        print("\t\t" + str(avp))
+
+                print("Attribure-Value Pairs:")
+                for avp in avps:
+                    print("\t\t" + str(avp))
+
         except KeyboardInterrupt:
             print("User exited background loop")
             break                       

@@ -700,7 +700,16 @@ class Diameter:
         for diameterApplication in self.diameterResponseList:
             try:
                 assert(packet_vars["command_code"] == diameterApplication["commandCode"])
-                assert(packet_vars["ApplicationId"] == diameterApplication["applicationId"])
+
+                if packet_vars["ApplicationId"] != diameterApplication["applicationId"]:
+                    self.logTool.log(service='HSS', level='debug', redisClient=self.redisMessaging,
+                        message="Invalid Applicatoin-Id {} expected {}".format(
+                            packet_vars["ApplicationId"],
+                            diameterApplication["applicationId"]
+                        )
+                    )
+                    assert(False)
+
                 if packet_vars["flags_bin"][0:1] == "1":
                     response['inbound'] = diameterApplication["requestAcronym"]
                     response['outbound'] = diameterApplication["responseAcronym"]
@@ -924,7 +933,16 @@ class Diameter:
                 for diameterApplication in self.diameterResponseList:
                     try:
                         assert(packet_vars["command_code"] == diameterApplication["commandCode"])
-                        assert(packet_vars["ApplicationId"] == diameterApplication["applicationId"])
+
+                        if packet_vars["ApplicationId"] != diameterApplication["applicationId"]:
+                            self.logTool.log(service='HSS', level='debug', redisClient=self.redisMessaging,
+                                message="Invalid Applicatoin-Id {} expected {}".format(
+                                    packet_vars["ApplicationId"],
+                                    diameterApplication["applicationId"]
+                                )
+                            )
+                            assert(False)
+
                         if 'flags' in diameterApplication:
                             assert(str(packet_vars["flags"]) == str(diameterApplication["flags"]))
                         self.logTool.log(service='HSS', level='debug', message=f"[diameter.py] [generateDiameterResponse] [{diameterApplication.get('requestAcronym', '')}] Attempting to generate response", redisClient=self.redisMessaging)

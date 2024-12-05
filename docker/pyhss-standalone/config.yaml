@@ -47,7 +47,7 @@ hss:
   Default_Sh_UserData: 'default_sh_user_data.xml'
 
 logging:
-  level: DEBUG
+  level: INFO
   logfiles:
     hss_logging_file: ${PYHSS_LOG_DIR}/hss.log
     diameter_logging_file: ${PYHSS_LOG_DIR}/diameter.log

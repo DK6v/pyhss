@@ -23,3 +23,8 @@ Connect to the database, open "Objects Explorer" -> "Servers" -> "Register":
 - Host name: pyhss.psql.0
 - Maintanance database: HSS
 - Username/Password: *see .secrets for details*
+
+### Run PyHSS tools
+```shell
+docker exec -it -w /pyhss/bin/tools pyhss bash
+```
