@@ -1,8 +1,19 @@
-FROM ubuntu:focal as builder
-ENV DEBIAN_FRONTEND=noninteractive
+ARG VERSION
+ARG TIMEZONE="Europe/Moscow"
+
+# Stage: install
+# -------------------------------------
+FROM ubuntu:focal AS install
+
 ENV LD_LIBRARY_PATH=/open5gs/install/lib/x86_64-linux-gnu
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+
+WORKDIR /pyhss
+
+RUN export DEBIAN_FRONTEND=noninteractive \
+ # Synchronize package index
+ && apt-get update \
+ # Install packages
+ && apt-get install -y --no-install-recommends \
         python3-pip python3-dev\
         python3-setuptools \
         python3-wheel \
@@ -10,7 +21,6 @@ RUN apt-get update && \
         build-essential \
         flex \
         bison \
-        git \
         libsctp-dev \
         libgnutls28-dev \
         libgcrypt-dev \
@@ -36,15 +46,25 @@ RUN apt-get update && \
         python3-psycopg2 \
         vim \
         tcpdump \
-        redis-server
-RUN git clone https://github.com/nickvsnetworking/pyhss.git
-WORKDIR pyhss
-COPY config.yaml ./
-COPY *.sh ./
-RUN mkdir -p log && \
-    pip3 install -r requirements.txt && \
-    cp /pyhss/tools/Diameter_client.py /pyhss/ && \
-    chmod +x *.sh
+        redis-server \
+        # Install the 'envsubst' tool, required to process variables in configuration file.
+        gettext-base gawk
+
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
+
+COPY lib ./bin/lib
+COPY services ./bin/services
+
+# Stage: squash
+# -------------------------------------
+FROM scratch
+COPY --from=install / /
+
+WORKDIR /pyhss
+
+COPY ./docker/pyhss-standalone/source/*.sh .
+RUN chmod +x *.sh
 
 ENTRYPOINT [ "/pyhss/entrypoint.sh" ]
-CMD [ "/usr/bin/python3", "hss.py" ] 
+CMD [ "/pyhss/run.sh" ]

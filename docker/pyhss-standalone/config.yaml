@@ -2,7 +2,7 @@
 hss:
   transport: "TCP"
   #IP Addresses to bind on (List) - For TCP only the first IP is used, for SCTP all used for Transport (Multihomed).
-  bind_ip: ["template_HSS_IP"]
+  bind_ip: ["0.0.0.0"]
 
   #Port to listen on (Same for TCP & SCTP)
   bind_port: 3868
@@ -45,34 +45,39 @@ hss:
 
   #Default Sh User Data
   Default_Sh_UserData: 'default_sh_user_data.xml'
-  
+
 logging:
   level: DEBUG
   logfiles:
-    hss_logging_file: log/hss.log
-    diameter_logging_file: log/diameter.log
-    database_logging_file: log/db.log
+    hss_logging_file: ${PYHSS_LOG_DIR}/hss.log
+    diameter_logging_file: ${PYHSS_LOG_DIR}/diameter.log
+    database_logging_file: ${PYHSS_LOG_DIR}/db.log
   log_to_terminal: true
 
 ## Database Parameters
-#Multiple database types are supported, and additional database can be added easily.
-#See ``databases.md`` for information on connecting to your database of choice, with your preferred schema.
+# Multiple database types are supported, and additional database can be added easily.
+# See ``databases.md`` for information on connecting to your database of choice, with your preferred schema.
 database:
-  HSS_DB_TYPE:
-    server: HSS_DB_SERVER
-    username: HSS_DB_USERNAME
-    password: HSS_DB_PASSWORD
-    database: HSS_DB_DB
-    port: HSS_DB_PORT
+  db_type: postgresql
+  server: pyhss.psql.0
+  database: ${POSTGRES_DB}
+  username: ${POSTGRES_USER}
+  password: ${POSTGRES_PASSWORD}
+  readCacheEnabled: True
+  readCacheInterval: 60
 
 ## Stats Parameters
 redis:
   enabled: False
   clear_stats_on_boot: True
-  host: localhost
+  host: pyhss.redis
   port: 6379
-
 
 snmp:
   port: 1161
   listen_address: 127.0.0.1
+
+api:
+  page_size: 200
+  # Whether or not to return key-based data when querying the AUC. Disable in production systems.
+  enable_insecure_auc: True
