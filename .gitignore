@@ -3,5 +3,6 @@
 */*.pyc
 **/.venv
 
-docker/*/.local
-docker/*/.secret
+docker/**/.local
+docker/**/.secret
+docker/**/logs
