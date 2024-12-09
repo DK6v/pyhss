@@ -29,27 +29,23 @@
 
 <init>
   <send channel="channel-1">
-    <command name="CER">
-      <avp name="Origin-Host" value="seagull.ims.hpintelco.org"> </avp>
-      <avp name="Origin-Realm" value="ims.hpintelco.org"> </avp>
-      <avp name="Host-IP-Address" value="0x00010a03fc5e"> </avp> <!-- IPV4 10.3.252.94-->
-      <avp name="Vendor-Id" value="11"> </avp>
-      <avp name="Product-Name" value="HP Cx Interface"> </avp>
-      <avp name="Origin-State-Id" value="1094807040"> </avp>
-      <avp name="Supported-Vendor-Id" value="10415"> </avp>
-      <avp name="Auth-Application-Id" value="16777216"> </avp>
-      <avp name="Acct-Application-Id" value="0"> </avp>
+  <command name="LIR">
+      <avp name="Session-Id" value="1"> </avp>
       <avp name="Vendor-Specific-Application-Id">
         <avp name="Vendor-Id" value="11"></avp>
         <avp name="Auth-Application-Id" value="16777216"></avp>
         <avp name="Acct-Application-Id" value="0"></avp>
       </avp>
-      <avp name="Firmware-Revision" value="1"> </avp>
+      <avp name="Auth-Session-State" value="0"> </avp>
+      <avp name="Origin-Host" value="seagull"> </avp>
+      <avp name="Origin-Realm" value="seagull"> </avp>
+      <avp name="Destination-Realm" value="Cx"> </avp>
+      <avp name="Vendor-Public-Identity" value="sip:250800000000001"> </avp>
     </command>
   </send>
   
   <receive channel="channel-1">
-    <command name="CEA">
+    <command name="LIA">
     </command>
   </receive>
 </init>
@@ -71,20 +67,18 @@
     </action>
     <command name="LIR">
       <avp name="Session-Id" value="value_is_replaced"> </avp>
+      <!--
       <avp name="Vendor-Specific-Application-Id">
         <avp name="Vendor-Id" value="11"></avp>
         <avp name="Auth-Application-Id" value="16777216"></avp>
         <avp name="Acct-Application-Id" value="0"></avp>
       </avp>
-      <avp name="Auth-Session-State" value="1"> </avp>
+      -->
+      <avp name="Auth-Session-State" value="0"> </avp>
       <avp name="Origin-Host" value="seagull"> </avp>
-      <avp name="Origin-Realm" value="ims.hpintelco.org"> </avp>
-      <avp name="Destination-Realm" value="ims.hpintelco.org"> </avp>
-      <avp name="Server-Name" value="seagull"> </avp>
-      <avp name="Server-Assignment-Type" value="3"> </avp>
-      <avp name="User-Data-Request-Type" value="0"> </avp>
+      <avp name="Origin-Realm" value="seagull"> </avp>
+      <avp name="Destination-Realm" value="Cx"> </avp>
       <avp name="Vendor-Public-Identity" value="sip:250800000000001"> </avp>
-      <avp name="Destination-Host" value="hss.ims.hpintelco.org"> </avp>
     </command>
     <action>
       <start-timer></start-timer>

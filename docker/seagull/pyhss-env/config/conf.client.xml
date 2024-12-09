@@ -33,10 +33,10 @@
     name="channel-1"
     protocol="diameter-v1"
     transport="trans-1"
-    open-args="mode=client;dest=pyhss:3868">
+    open-args="mode=client;dest=localhost:3868">
   </define>
 
-  <define entity="traffic-param" name="call-rate" value="30"></define>	
+  <define entity="traffic-param" name="call-rate" value="50"></define>	
   <define entity="traffic-param" name="display-period" value="1"></define>
   <define entity="traffic-param" name="log-stat-period" value="1"></define>
   <define entity="traffic-param" name="log-stat-file" value="../logs/client-stat.csv"></define>
@@ -54,8 +54,8 @@
   <define entity="traffic-param" name="data-log-rtdistrib" value="3000"></define>
 -->
 
-  <define entity="traffic-param" name="max-send" value="200"></define>
-  <define entity="traffic-param" name="max-receive" value="200"></define>
+  <define entity="traffic-param" name="max-send" value="500"></define>
+  <define entity="traffic-param" name="max-receive" value="500"></define>
   <define entity="traffic-param" name="max-simultaneous-calls" value="2000"></define>
   <define entity="traffic-param" name="select-timeout-ms" value="50"></define>
 
