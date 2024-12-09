@@ -22,63 +22,29 @@
 <scenario>
 
 <counter>
-  <counterdef name="HbH-counter" init="1000"> </counterdef>
-  <counterdef name="EtE-counter" init="2000"> </counterdef>
   <counterdef name="session-counter" init="0"> </counterdef>
+  <counterdef name="imsi-counter" init="250800000000001" max="2508000000000100" behavior="init"></counterdef>
 </counter>
-
-<init>
-  <send channel="channel-1">
-  <command name="LIR">
-      <avp name="Session-Id" value="1"> </avp>
-      <avp name="Vendor-Specific-Application-Id">
-        <avp name="Vendor-Id" value="11"></avp>
-        <avp name="Auth-Application-Id" value="16777216"></avp>
-        <avp name="Acct-Application-Id" value="0"></avp>
-      </avp>
-      <avp name="Auth-Session-State" value="0"> </avp>
-      <avp name="Origin-Host" value="seagull"> </avp>
-      <avp name="Origin-Realm" value="seagull"> </avp>
-      <avp name="Destination-Realm" value="Cx"> </avp>
-      <avp name="Vendor-Public-Identity" value="sip:250800000000001"> </avp>
-    </command>
-  </send>
-  
-  <receive channel="channel-1">
-    <command name="LIA">
-    </command>
-  </receive>
-</init>
 
 <!-- Traffic -->
 <traffic>
   <send channel="channel-1">
     <action>
       <!-- For each new call, increment the session-ID counter -->
-      <inc-counter name="HbH-counter"> </inc-counter>
-      <inc-counter name="EtE-counter"> </inc-counter>
       <inc-counter name="session-counter"> </inc-counter>
-      <set-value name="HbH-id" 
-                 format="$(HbH-counter)"></set-value>
-      <set-value name="EtE-id" 
-                 format="$(EtE-counter)"></set-value>
+      <inc-counter name="imsi-counter"> </inc-counter>
       <set-value name="Session-Id" 
                  format=".;1096298391;$(session-counter)"></set-value>
+      <set-value name="Vendor-Public-Identity" 
+                 format="sip:$(imsi-counter)"></set-value>
     </action>
     <command name="LIR">
       <avp name="Session-Id" value="value_is_replaced"> </avp>
-      <!--
-      <avp name="Vendor-Specific-Application-Id">
-        <avp name="Vendor-Id" value="11"></avp>
-        <avp name="Auth-Application-Id" value="16777216"></avp>
-        <avp name="Acct-Application-Id" value="0"></avp>
-      </avp>
-      -->
       <avp name="Auth-Session-State" value="0"> </avp>
       <avp name="Origin-Host" value="seagull"> </avp>
       <avp name="Origin-Realm" value="seagull"> </avp>
       <avp name="Destination-Realm" value="Cx"> </avp>
-      <avp name="Vendor-Public-Identity" value="sip:250800000000001"> </avp>
+      <avp name="Vendor-Public-Identity" value="value_is_replaced"> </avp>
     </command>
     <action>
       <start-timer></start-timer>
