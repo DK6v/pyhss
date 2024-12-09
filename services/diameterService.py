@@ -245,21 +245,38 @@ class DiameterService:
         """
         await(self.logTool.logAsync(service='Diameter', level='debug', message=f"[Diameter] [readInboundData] [{coroutineUuid}] New connection from {clientAddress} on port {clientPort}"))
         clientConnection = f"{clientAddress}-{clientPort}"
-        while True:
-            try:
 
-                inboundData = await(asyncio.wait_for(reader.read(8192), timeout=socketTimeout))
+        while True:
+
+            inboundData = b''
+            try:
+                inboundData += await(asyncio.wait_for(reader.read(8192), timeout=socketTimeout))
 
                 if reader.at_eof():
                     return False
 
-                if len(inboundData) > 0:
-                    inboundData = InboundData(SenderIp=clientAddress,
-                                              SenderPort=clientPort,
-                                              InitialReceiveTimestamp=time.time_ns(),
-                                              InboundHex=inboundData.hex())
-                    
-                    self.sharedQueue.put_nowait(inboundData)
+                while len(inboundData) > 0:
+
+                    chunkLength = int.from_bytes(inboundData[1:4], byteorder='big')
+
+                    if chunkLength > len(inboundData):
+                        break
+
+                    if chunkLength > 1024:
+                        await(self.logTool.logAsync(service='Diameter', level='info', message=f"[Diameter] [readInboundData] Invalid packet length {chunkLength}"))
+                        return False
+
+                    if inboundData[0] != 0x01:
+                        await(self.logTool.logAsync(service='Diameter', level='info', message=f"[Diameter] [readInboundData] Invalid packet version {inboundData[0]}"))
+                        return False
+
+                    chunkData = InboundData(SenderIp=clientAddress,
+                                            SenderPort=clientPort,
+                                            InitialReceiveTimestamp=time.time_ns(),
+                                            InboundHex=inboundData[:chunkLength].hex())
+                    inboundData = inboundData[chunkLength:]
+
+                    self.sharedQueue.put_nowait(chunkData)
 
             except Exception as e:
                 await(self.logTool.logAsync(service='Diameter', level='info', message=f"[Diameter] [readInboundData] [{coroutineUuid}] Socket Exception for {clientAddress} on port {clientPort}, closing connection.\n{e}"))
@@ -279,7 +296,7 @@ class DiameterService:
                     try:
                         inboundData = await(asyncio.wait_for(self.sharedQueue.get(), timeout=nextSendTime - time.time()))
 
-                        if len(self.activePeers.get(f'{inboundData.SenderIp}-{inboundData.SenderPort}', {}).Metadata) == 0:
+                        if not hasattr(self.activePeers.get(f'{inboundData.SenderIp}-{inboundData.SenderPort}', {}), 'Metadata'):
                             if not await(self.validateDiameterInbound(inboundData.SenderIp, inboundData.SenderPort, inboundData.InboundHex)):
                                 await(self.logTool.logAsync(service='Diameter', level='warning', message=f"[Diameter] [inboundDataWorker] [{coroutineUuid}] Invalid Diameter Inbound, discarding data."))
                                 continue
