@@ -33,8 +33,9 @@ services:
       - .secret
     environment:
       - PYHSS_COMPONENT_NAME=${PYHSS_COMPONENT_NAME:-HSS}
-      - PYHSS_LOG_ENABLED=false
-      - PYHSS_LOG_DIR=/pyhss/logs
+      - PYHSS_LOG_LEVEL=INFO
+      - PYHSS_LOG_FILES_ENABLED=false
+      - PYHSS_LOG_FILES_PATH=/pyhss/logs
     volumes:
       - ./.local/pyhss:/mnt/hss
       - ./.local/logs:/pyhss/logs

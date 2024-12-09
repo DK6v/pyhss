@@ -50,6 +50,12 @@ RUN export DEBIAN_FRONTEND=noninteractive \
         # Install the 'envsubst' tool, required to process variables in configuration file.
         gettext-base gawk
 
+RUN export DEBIAN_FRONTEND=noninteractive \
+ && apt-get install -y --no-install-recommends \
+    htop \
+    sysstat \
+    linux-tools-generic
+
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 
