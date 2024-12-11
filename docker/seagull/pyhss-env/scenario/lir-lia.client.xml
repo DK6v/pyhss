@@ -23,7 +23,7 @@
 
 <counter>
   <counterdef name="session-counter" init="0"> </counterdef>
-  <counterdef name="imsi-counter" init="250800000000001" max="2508000000000100" behavior="init"></counterdef>
+  <counterdef name="imsi-counter" init="250800000000001" max="2508000000001000" behavior="init"></counterdef>
 </counter>
 
 <!-- Traffic -->
@@ -41,7 +41,7 @@
     <command name="LIR">
       <avp name="Session-Id" value="value_is_replaced"> </avp>
       <avp name="Auth-Session-State" value="0"> </avp>
-      <avp name="Origin-Host" value="seagull"> </avp>
+      <avp name="Origin-Host" value="cx-client"> </avp>
       <avp name="Origin-Realm" value="seagull"> </avp>
       <avp name="Destination-Realm" value="Cx"> </avp>
       <avp name="Vendor-Public-Identity" value="value_is_replaced"> </avp>

@@ -1,0 +1,52 @@
+
+Test environment: 16 CPU, 32GB RAM
+Measurements: 100% means 1 CPU utilization
+Database:
+- ims_subscribers, subscribers, apn and auc tables are in use
+- 1000 records per table
+
+Number of simulations: 1 client
+===================================================
+
+LIR-LIA, IMSI in range(1,1000)
+---------------------------------------------------
+            | 50 msg/s | 100 msg/s | 150 msg/s | 200 msg/s DROPS
+hss         | 33%      | 58%       | 64%       | 65%
+diameter    | 12%      | 20%       | 27%       | 33%
+redis       | 9%       | 17%       | 23%       | 26
+psql        | 5        | 10%       | 13%       | 14%
+
+
+UDR-UDA, IMSI in range(1,1000), response size is 1288 bytes
+---------------------------------------------------
+            | 50 msg/s | 100 msg/s | 150 msg/s DROPS
+hss         | 47%      | 64%       | 66%
+diameter    | 12%      | 19%       | 27%
+redis       | 8%       | 14%       | 18%
+psql        | 9%       | 14%       | 16%
+
+
+Test environment: 16 CPU, 32GB RAM
+Measurements: 100% means 1 CPU utilization
+Database:
+- ims_subscribers, subscribers, apn and auc tables are in use
+- 1000 records per table
+
+Number of simulations: 2 clients (intensity is summarized)
+===================================================
+
+LIR-LIA IMSI in range(1,1000)
+---------------------------------------------------
+            | 50 msg/s | 100 msg/s | 150 msg/s | 200 msg/s | 250 msg/s | 300 msg/s DROPS
+hss         | 28%      | 53%       | 58%       | 62%       | 66%       | 70%
+diameter    | 11%      | 16%       | 22%       | 29%       | 36%       | 32%
+redis       | 8%       | 14%       | 15%       | 19%       | 19%       | 19%
+psql        | 4%       | 8%        | 12%       | 15%       | 18%       | 19%
+
+UDR-UDA, IMSI in range(1,1000), response size is 1288 bytes
+---------------------------------------------------
+            | 50 msg/s | 100 msg/s | 150 msg/s | 200 msg/s DROPS
+hss         | 42%      | 58%       | 63%       | 71%
+diameter    | 10%      | 17%       | 22%       | 26%
+redis       | 8%       | 12%       | 14%       | 16%
+psql        | 8%       | 12%       | 18%       | 23%

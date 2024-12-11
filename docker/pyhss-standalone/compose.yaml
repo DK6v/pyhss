@@ -40,6 +40,7 @@ services:
       - ./.local/pyhss:/mnt/hss
       - ./.local/logs:/pyhss/logs
       - ./config.yaml:/pyhss/config.yaml
+      - ./default_sh_user_data.xml:/pyhss/bin/default_sh_user_data.xml
     ports:
       - "3868:3868/tcp"
       - "3868:3868/sctp"

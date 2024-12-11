@@ -1,0 +1,84 @@
+<!--
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+ (c)Copyright 2006 Hewlett-Packard Development Company, LP.
+
+  Authors: Perrin Morrow <perrin@opencloud.com>
+
+-->
+
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<scenario>
+
+  <counter>
+    <counterdef name="HbH-counter" init="1000"></counterdef>
+    <counterdef name="EtE-counter" init="2000"></counterdef>
+    <counterdef name="session-counter" init="0"></counterdef>
+    <counterdef name="imsi-counter"
+                init="250800000000001"
+                max="250800000001000"
+                behavior="init"></counterdef>
+  </counter>
+
+  <!-- Traffic -->
+  <traffic>
+
+    <!-- User-Data-Request -->
+    <send channel="channel-1">
+      <action>
+        <!-- For each request, increment the session-ID counter -->
+        <inc-counter name="HbH-counter"></inc-counter>
+        <inc-counter name="EtE-counter"></inc-counter>
+        <inc-counter name="session-counter"></inc-counter>
+        <inc-counter name="imsi-counter"> </inc-counter>
+        <set-value name="HbH-id" format="$(HbH-counter)"></set-value>
+        <set-value name="EtE-id" format="$(EtE-counter)"></set-value>
+        <set-value name="Session-Id" format="seagull;1096298391;$(session-counter)"></set-value>
+        <set-value name="Public-Identity"
+                   format="sip:$(imsi-counter)"></set-value>
+        <set-value name="User-Identity"
+                   format="sip:$(imsi-counter)"></set-value>
+      </action>
+      <command name="UDR">
+        <avp name="Session-Id" value="value_is_replaced"></avp>
+        <avp name="Auth-Session-State" value="1"></avp>
+        <avp name="Origin-Host" value="sh-client"></avp>
+        <avp name="Origin-Realm" value="seagull"></avp>
+        <avp name="Destination-Host" value="sh-server"></avp>
+        <avp name="Destination-Realm" value="seagull"></avp>
+        <avp name="User-Identity-Group">
+          <avp name="Public-Identity" value="sip:250800000003601"></avp>
+          <avp name="User-Identity" value="sip:250800000003601"></avp>
+        </avp>
+        <avp name="Data-Reference" value="10"></avp> <!-- IMS_PUBLIC_IDENTITY -->
+      </command>
+      <action>
+        <start-timer></start-timer>
+      </action>
+    </send>
+
+    <receive channel="channel-1">
+      <action>
+        <stop-timer></stop-timer>
+      </action>
+      <command name="UDA">
+      </command>
+    </receive>
+
+  </traffic>
+
+</scenario>
+
