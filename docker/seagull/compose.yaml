@@ -12,10 +12,3 @@ services:
       - ./pyhss-env/logs:/opt/seagull/pyhss-env/logs
     restart: "no"
     network_mode: "host"
-
-# # Use the command below to create a network:
-# # $> docker network create pyhss-internal
-# networks:
-#   default:
-#     external: true
-#     name: "pyhss-internal"

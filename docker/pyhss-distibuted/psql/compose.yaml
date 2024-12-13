@@ -1,0 +1,75 @@
+services:
+  init:
+    container_name: pyhss-ds.psql.init
+    image: busybox
+
+    # Note: almquist (ash) shell syntax is used here!
+    entrypoint: /bin/sh -c
+    command: |
+              '''
+              # Create sub-directories
+              mkdir -p /mnt/local/pgadmin
+              # Change ownership
+              chown -R :docker /mnt/local
+              chown -R 5050 /mnt/local/pgadmin
+              # Change permissions
+              chmod -R ug=rwX,o=rX /mnt/local
+              '''
+    volumes:
+      # Mount the 'docker' GID to grant permissions.
+      - /etc/group:/etc/group:ro
+      - ./.local:/mnt/local
+    restart: "no"
+
+  psql.0:
+    image: postgres:${POSTGRES_VERSION}
+    container_name: pyhss-ds.psql.0
+    env_file:
+      - .secret
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./.local/pgdata:/var/lib/postgresql/data/pgdata
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: "grep -q $$(printf %.2X%.2X%.2X%.2X:%.4X 0 0 0 0 5432) /proc/net/tcp"
+      interval: 5s
+      retries: 60
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4:${PGADMIN_VERSION}
+    container_name: pyhss-ds.psql.pgadmin
+    env_file:
+      - .secret
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: 30
+      GUNICORN_ACCESS_LOGFILE: /dev/null
+    volumes:
+      - ./.local/pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    depends_on:
+      init:
+        condition: service_completed_successfully
+      psql.0:
+        condition: service_healthy
+    healthcheck:
+      test: "grep -q $$(printf %.2X%.2X%.2X%.2X:%.4X 0 0 0 0 80) /proc/net/tcp"
+      interval: 5s
+      retries: 60
+    restart: "no"
+
+# Use the command below to create a network:
+# $> docker network create pyhss-internal
+networks:
+  default:
+    external: true
+    name: "pyhss-internal"

@@ -1,0 +1,72 @@
+services:
+  init:
+    container_name: pyhss-ds.pyhss.init
+    image: busybox
+
+    # Note: almquist (ash) shell syntax is used here!
+    entrypoint: /bin/sh -c
+    command: |
+              '''
+              # Change ownership
+              chown -R :docker /mnt/local
+              # Change permissions
+              chmod -R ug=rwX,o=rX /mnt/local
+              '''
+    volumes:
+      # Mount the 'docker' GID to grant permissions.
+      - /etc/group:/etc/group:ro
+      - ./.local:/mnt/local
+    restart: "no"
+
+  fe.0:
+    container_name: pyhss-ds.pyhss.fe.0
+    image: pyhss:${PYHSS_VERSION}
+    build:
+      context: ../..
+      dockerfile: ./docker/pyhss-distributed/pyhss/source/Dockerfile
+      args:
+        - VERSION=${PYHSS_VERSION}
+    env_file:
+      - .secret
+    environment:
+      - PYHSS_COMPONENT_NAME=${PYHSS_COMPONENT_NAME:-HSS}
+      - PYHSS_LOG_LEVEL=INFO
+      - PYHSS_LOG_FILES_ENABLED=false
+      - PYHSS_LOG_FILES_PATH=/pyhss/logs
+    volumes:
+      - ./.local/pyhss:/mnt/hss
+      - ./.local/logs:/pyhss/logs
+      - ./config.yaml:/pyhss/config.yaml
+      - ./default_sh_user_data.xml:/pyhss/bin/default_sh_user_data.xml
+    ports:
+      - "3868:3868/tcp"
+      - "3868:3868/sctp"
+      # Swagger API
+      - "5000:8080"
+    depends_on:
+      init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    restart: "no"
+
+  # Required by redis:
+  # - sudo sysctl vm.overcommit_memory=1
+  redis:
+    container_name: pyhss-ds.pyhss.redis
+    image: redis:${REDIS_VERSION}
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: "grep -q $$(printf %.2X%.2X%.2X%.2X:%.4X 0 0 0 0 6379) /proc/net/tcp"
+      interval: 5s
+      retries: 60
+    restart: unless-stopped
+
+# Use the command below to create a network:
+# $> docker network create pyhss-internal
+networks:
+  default:
+    external: true
+    name: "pyhss-internal"
