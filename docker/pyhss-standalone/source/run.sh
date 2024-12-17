@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+PYHSS_HSS_SERVICE_WORKERS=${PYHSS_HSS_SERVICE_WORKERS:-1}
+
 cd ./services || exit 1
 
 echo -n " * Starting API service... "
@@ -22,9 +24,15 @@ if [ "$PYHSS_LOG_FILES_ENABLED" == "true" ]; then
     echo "Done (pid: ${log_service_pid=$!})"
 fi
 
-echo -n " * Starting HSS service... "
-python3 hssService.py &
-hss_service_pid=$!
-echo "Done (pid: ${hss_service_pid=$!})"
+for ix in $(seq 1 "$PYHSS_HSS_SERVICE_WORKERS"); do
+    echo -n " * Starting HSS:${ix} service... "
+    python3 hssService.py &
+    hss_service_pids[ix]=$!
+    echo "Done (pid: ${hss_service_pids[ix]})"
+done
 
-wait ${hss_service_pid} 2>/dev/null
+# wait for all pids
+echo "Wait for pids: ${hss_service_pids[*]}"
+for pid in "${hss_service_pids[@]}"; do
+    wait "$pid"
+done

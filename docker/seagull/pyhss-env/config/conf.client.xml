@@ -36,11 +36,11 @@
     open-args="mode=client;dest=localhost:3868">
   </define>
 
-  <define entity="traffic-param" name="call-rate" value="1"></define>	
+  <define entity="traffic-param" name="call-rate" value="400"></define>	
   <define entity="traffic-param" name="display-period" value="1"></define>
   <define entity="traffic-param" name="log-stat-period" value="1"></define>
   <define entity="traffic-param" name="log-stat-file" value="../logs/client-stat.csv"></define>
-  <define entity="traffic-param" name="call-timeout-ms" value="10000"></define>
+  <define entity="traffic-param" name="call-timeout-ms" value="5000"></define>
   <define entity="traffic-param" name="display-scenario-stat" value="true"></define>
   <define entity="traffic-param" name="display-protocol-stat" value="true"></define>
   <define entity="traffic-param" name="log-protocol-stat-period" value="5"></define>

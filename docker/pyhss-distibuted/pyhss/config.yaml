@@ -62,7 +62,7 @@ hss:
   async_check_interval: 0
 
   # The number of Diameter workers
-  diameter_service_workers: 32
+  diameter_service_workers: 128
   diameter_request_timeout: 10
 
 logging:

@@ -22,8 +22,8 @@ services:
     container_name: pyhss-ds.pyhss.fe.0
     image: pyhss:${PYHSS_VERSION}
     build:
-      context: ../..
-      dockerfile: ./docker/pyhss-distributed/pyhss/source/Dockerfile
+      context: ../../.. # project directory
+      dockerfile: ./docker/pyhss-distibuted/pyhss/source/Dockerfile
       args:
         - VERSION=${PYHSS_VERSION}
     env_file:
@@ -33,6 +33,7 @@ services:
       - PYHSS_LOG_LEVEL=INFO
       - PYHSS_LOG_FILES_ENABLED=false
       - PYHSS_LOG_FILES_PATH=/pyhss/logs
+      - PYHSS_HSS_SERVICE_WORKERS=8
     volumes:
       - ./.local/pyhss:/mnt/hss
       - ./.local/logs:/pyhss/logs

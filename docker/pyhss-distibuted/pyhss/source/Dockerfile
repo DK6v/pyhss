@@ -70,7 +70,7 @@ COPY --from=install / /
 
 WORKDIR /pyhss
 
-COPY ./docker/pyhss-standalone/source/*.sh .
+COPY ./docker/pyhss-distibuted/pyhss/source/*.sh .
 RUN chmod +x *.sh
 
 ENTRYPOINT [ "/pyhss/entrypoint.sh" ]
